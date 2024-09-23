@@ -1,10 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { userContext } from "../hooks/userContext";
 
-function ChatFooter() {
+function ChatFooter({ socket }) {
   const [message, setMessage] = useState("");
+  const { userName } = useContext(userContext);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
+    socket.emit("sendMessage", {
+      userName,
+      socketID: socket.id,
+      message,
+    });
     setMessage("");
   };
 

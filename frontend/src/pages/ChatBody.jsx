@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function ChatBody() {
+function ChatBody({ socket }) {
+  const [chatMessages, setChatMessages] = useState([]);
+
+  useEffect(() => {
+    socket.on("newMessage", (messages) => {
+      setChatMessages([...chatMessages, messages]);
+    });
+  }, [chatMessages]);
+
   const navigate = useNavigate();
 
   const handleLeaveChat = () => {
@@ -24,20 +32,26 @@ function ChatBody() {
 
       {/* message envoyé par vous */}
       <div className="message__container">
-        <div className="message__chats">
-          <p className="sender__name">You</p>
-          <div className="message__sender">
-            <p>Hello there</p>
+        {chatMessages.map((message, index) => (
+          /* eslint-disable react/no-array-index-key */
+          <div className="message__chats" key={index}>
+            {message.socketID === socket.id ? (
+              <>
+                <p className="sender__name">You</p>
+                <div className="message__sender">
+                  <p>{message.message}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p>{message.userName}</p>
+                <div className="message__recipient">
+                  <p>{message.message}</p>
+                </div>
+              </>
+            )}
           </div>
-        </div>
-
-        {/* message reçu par vous */}
-        <div className="message__chats">
-          <p>Other</p>
-          <div className="message__recipient">
-            <p>Hey, I'm good, you?</p>
-          </div>
-        </div>
+        ))}
 
         {/* Quand je tape un message */}
         <div className="message__status">
